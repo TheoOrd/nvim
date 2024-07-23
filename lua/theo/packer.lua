@@ -14,19 +14,29 @@ return require('packer').startup(function(use)
 		end
 	}
 	use('nvim-treesitter/nvim-treesitter', { run = ':TSUpdate'})
-	use 'nvim-treesitter/playground'
+	use'nvim-treesitter/playground'
 	use'theprimeagen/harpoon'
+	use'theprimeagen/vim-be-good'
 	use'mbbill/undotree'
 	use'tpope/vim-fugitive'
-	use {
-		'vonheikemen/lsp-zero.nvim',
-		branch = 'v3.x',
-		requires = {
-			{ 'williamboman/mason.nvim' },
-			{ 'williamboman/mason-lspconfig.nvim' },
-			{ 'neovim/nvim-lspconfig' },
-			{ 'hrsh7th/nvim-cmp' },
-			{ 'L3MON4D3/LuaSnip' },
-		}
-	}
+
+	-- cmp plugins
+	use 'hrsh7th/nvim-cmp'
+	use 'hrsh7th/cmp-buffer'
+	use 'hrsh7th/cmp-path'
+	use 'hrsh7th/cmp-cmdline'
+	use 'saadparwaiz1/cmp_luasnip'
+	use 'hrsh7th/cmp-nvim-lsp'
+	use 'hrsh7th/cmp-nvim-lua'
+
+	-- snippets
+	use 'L3MON4D3/LuaSnip'
+	use 'rafamadriz/friendly-snippets'
+
+	-- LSP
+	use 'neovim/nvim-lspconfig'
+	use 'williamboman/mason.nvim'
+	use 'williamboman/mason-lspconfig.nvim'
+	use 'jose-elias-alvarez/null-ls.nvim'
 end)
+
