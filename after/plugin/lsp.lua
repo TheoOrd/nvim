@@ -2,11 +2,6 @@ local cmp = require('cmp')
 local luasnip = require('luasnip')
 require('luasnip/loaders/from_vscode').lazy_load()
 
-local check_backspace = function()
-	local col = vim.fn.col '.' - 1
-	return col == 0 or vim.fn.getLine('.'):sub(col, col):match '%s'
-end
-
 local kind_icons = {
 	Text         = '🐖',
 	Method       = '🔧',
@@ -22,7 +17,7 @@ local kind_icons = {
 	Value        = '💎',
 	Enum         = '🔢',
 	Keyword      = '🔤',
-	Snippet      = '✂️', 
+	Snippet      = '✂️',
 	Color        = '🎨',
 	File         = '📄',
 	Reference    = '🔗',
@@ -38,7 +33,8 @@ local kind_icons = {
 cmp.setup {
 	snippet = {
 		expand = function(args)
-			luasnip.lsp_expand(args.body)
+			-- luasnip.lsp_expand(args.body)
+			-- maybe later
 		end,
 	},
 	mapping = {
@@ -118,4 +114,53 @@ vim.diagnostic.config({
 	severity_sort = true,
 })
 
+local on_attach = function(_, bufnr)
+	local bufopts = { noremap=true, silent=true, buffer=bufnr }
+	vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
+	vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
+	vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
+	vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
+	vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, bufopts)
+	vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, bufopts)
+	vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, bufopts)
+	vim.keymap.set('n', ']d', vim.diagnostic.goto_next, bufopts)
+end
+
 require('mason').setup()
+require('mason-lspconfig').setup {
+	ensure_installed = { 'ts_ls', 'pyright', 'lua_ls' },
+}
+
+local lspconfig = require('lspconfig')
+
+lspconfig.ts_ls.setup {
+	on_attach = on_attach,
+}
+
+lspconfig.pyright.setup {
+	on_attach = on_attach,
+}
+
+lspconfig.lua_ls.setup {
+	on_attach = on_attach,
+	settings = {
+		Lua = {
+			diagnostics = {
+				globals = { 'vim' },
+			},
+		},
+	},
+}
+
+local null_ls = require('null-ls');
+null_ls.setup({
+	sources = {
+		null_ls.builtins.formatting.prettier,
+	},
+})
+
+vim.api.nvim_create_user_command('ProjectDiagnostics', function()
+	vim.diagnostic.setqflist()
+	vim.cmd('copen')
+end, {})
+vim.keymap.set('n', '<leader>pd', ':ProjectDiagnostics<CR>')
