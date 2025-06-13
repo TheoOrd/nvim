@@ -3,6 +3,7 @@ local luasnip = require('luasnip')
 require('luasnip/loaders/from_vscode').lazy_load()
 
 local kind_icons = {
+	Copilot      = '🤖',
 	Text         = '🐖',
 	Method       = '🔧',
 	Function     = '⚙️',
@@ -45,6 +46,8 @@ cmp.setup {
 		['<Tab>'] = cmp.mapping(function(fallback)
 			if cmp.visible() then
 				cmp.select_next_item()
+			elseif require('copilot.suggestion').is_visible() then
+				require('copilot.suggestion').accept()
 			elseif luasnip.expandable() then
 				luasnip.expand()
 			elseif luasnip.expand_or_jumpable() then
@@ -69,6 +72,7 @@ cmp.setup {
 			local k = vim_item.kind
 			vim_item.kind = (kind_icons[k] or '?') .. ' ';
 			vim_item.menu = ({
+				copilot = '[Copilot]',
 				nvim_lsp = '[LSP]',
 				nvim_lua = '[NVIM_LUA]',
 				luasnip = '[Snippet]',
@@ -79,9 +83,9 @@ cmp.setup {
 		end,
 	},
 	sources = {
+		{ name = 'copilot' },
 		{ name = 'nvim_lsp' },
 		{ name = 'nvim_lua' },
-		{ name = 'luasnip' },
 		{ name = 'buffer' },
 		{ name = 'path' },
 	},
@@ -129,35 +133,27 @@ end
 require('mason').setup()
 require('mason-lspconfig').setup {
 	ensure_installed = { 'ts_ls', 'pyright', 'lua_ls' },
-}
+	handlers = {
+		function(server_name)
+			vim.lsp.enable(server_name, {
+				on_attach = on_attach,
+			})
+		end,
 
-local lspconfig = require('lspconfig')
-
-lspconfig.ts_ls.setup {
-	on_attach = on_attach,
-}
-
-lspconfig.pyright.setup {
-	on_attach = on_attach,
-}
-
-lspconfig.lua_ls.setup {
-	on_attach = on_attach,
-	settings = {
-		Lua = {
-			diagnostics = {
-				globals = { 'vim' },
-			},
-		},
+		['lua_ls'] = function()
+			vim.lsp.enable('lua_ls', {
+				on_attach = on_attach,
+				settings = {
+					Lua = {
+						diagnostics = {
+							globals = { 'vim' },
+						},
+					},
+				},
+			})
+		end,
 	},
 }
-
-local null_ls = require('null-ls');
-null_ls.setup({
-	sources = {
-		null_ls.builtins.formatting.prettier,
-	},
-})
 
 vim.api.nvim_create_user_command('ProjectDiagnostics', function()
 	vim.diagnostic.setqflist()

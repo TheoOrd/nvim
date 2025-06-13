@@ -20,6 +20,31 @@ return require('packer').startup(function(use)
 	use'mbbill/undotree'
 	use'tpope/vim-fugitive'
 
+	-- Copilot
+	use {
+		'zbirenbaum/copilot.lua',
+		event = 'InsertEnter',
+		config = function()
+			require('copilot').setup({
+				suggestion = { enabled = false },
+				panel = { enabled = false },
+			})
+		end,
+	}
+	use {
+		'CopilotC-Nvim/CopilotChat.nvim',
+		requires = {
+			{ "zbirenbaum/copilot.lua" },
+			{ "nvim-lua/plenary.nvim" },
+			{ "nvim-telescope/telescope.nvim" },
+		},
+		config = function()
+			require('CopilotChat').setup({
+				show_help = false,
+			})
+		end,
+	}
+
 	-- cmp plugins
 	use 'hrsh7th/nvim-cmp'
 	use 'hrsh7th/cmp-buffer'
@@ -28,6 +53,13 @@ return require('packer').startup(function(use)
 	use 'saadparwaiz1/cmp_luasnip'
 	use 'hrsh7th/cmp-nvim-lsp'
 	use 'hrsh7th/cmp-nvim-lua'
+	use {
+		'zbirenbaum/copilot-cmp',
+		after = { 'copilot.lua' },
+		config = function()
+			require('copilot_cmp').setup()
+		end,
+	}
 
 	-- snippets
 	use 'L3MON4D3/LuaSnip'
@@ -37,6 +69,5 @@ return require('packer').startup(function(use)
 	use 'neovim/nvim-lspconfig'
 	use 'williamboman/mason.nvim'
 	use 'williamboman/mason-lspconfig.nvim'
-	use 'jose-elias-alvarez/null-ls.nvim'
 end)
 
