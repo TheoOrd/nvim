@@ -3,7 +3,6 @@ local luasnip = require('luasnip')
 require('luasnip/loaders/from_vscode').lazy_load()
 
 local kind_icons = {
-	Copilot      = '🤖',
 	Text         = '🐖',
 	Method       = '🔧',
 	Function     = '⚙️',
@@ -46,8 +45,6 @@ cmp.setup {
 		['<Tab>'] = cmp.mapping(function(fallback)
 			if cmp.visible() then
 				cmp.select_next_item()
-			elseif require('copilot.suggestion').is_visible() then
-				require('copilot.suggestion').accept()
 			elseif luasnip.expandable() then
 				luasnip.expand()
 			elseif luasnip.expand_or_jumpable() then
@@ -72,7 +69,6 @@ cmp.setup {
 			local k = vim_item.kind
 			vim_item.kind = (kind_icons[k] or '?') .. ' ';
 			vim_item.menu = ({
-				copilot = '[Copilot]',
 				nvim_lsp = '[LSP]',
 				nvim_lua = '[NVIM_LUA]',
 				luasnip = '[Snippet]',
@@ -83,7 +79,6 @@ cmp.setup {
 		end,
 	},
 	sources = {
-		{ name = 'copilot' },
 		{ name = 'nvim_lsp' },
 		{ name = 'nvim_lua' },
 		{ name = 'buffer' },
