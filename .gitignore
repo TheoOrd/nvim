@@ -1,0 +1,13 @@
+# local/private config
+lua/theo/local.lua
+
+# Neovim swap/session noise
+*.swp
+*.swo
+Session.vim
+nvim.log
+
+# OS/editor noise
+.DS_Store
+.idea/
+.vscode/
